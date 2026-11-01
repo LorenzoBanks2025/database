@@ -1,3 +1,4 @@
+/** Tests profile lookup filters and create, update, and delete behavior. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { FullzModel } from "../../models/fullzModel";

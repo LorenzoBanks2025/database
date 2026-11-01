@@ -1,3 +1,4 @@
+/** Compile-time and runtime smoke test for the Address type shape. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Address } from "../../types/address";

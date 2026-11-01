@@ -1,5 +1,6 @@
 import type { Address } from "../types/address.js";
 import type { AppDatabase } from "../db.js";
+/** SQLite definition of a personal profile record. */
 export declare const fullzTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
     name: "fullz";
     schema: undefined;
@@ -232,8 +233,16 @@ export declare const fullzTable: import("drizzle-orm/sqlite-core").SQLiteTableWi
     };
     dialect: "sqlite";
 }>;
+/** A personal profile row returned from the database. */
 export type Fullz = typeof fullzTable.$inferSelect;
+/** Values accepted when inserting a personal profile row. */
 export type NewFullz = typeof fullzTable.$inferInsert;
+/** Optional profile fields accepted by an update operation. */
 export type UpdateFullz = Partial<NewFullz>;
+/**
+ * Create the personal-profiles table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export declare function initFullzTable(db: AppDatabase): void;
 //# sourceMappingURL=fullzTable.d.ts.map

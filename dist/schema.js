@@ -3,13 +3,32 @@ import { initCCTable, ccTable } from "./schema/ccTable.js";
 import { initVisitorsTable, visitorsTable } from "./schema/visitorsTable.js";
 import { initFullzTable, fullzTable } from "./schema/fullzTable.js";
 import { initLeadsTable, leadsTable } from "./schema/leadsTable.js";
+/**
+ * Drizzle table definitions registered on the application database client.
+ *
+ * This object is used by Drizzle for typed queries; it does not itself create
+ * the corresponding tables in SQLite.
+ */
 export const DatabaseSchema = {
+    /** User records. */
     usersTable,
+    /** Payment-card records. */
     ccTable,
+    /** Visitor event records. */
     visitorsTable,
+    /** Personal profile records. */
     fullzTable,
+    /** Lead records. */
     leadsTable
 };
+/**
+ * Create each application table when it does not already exist.
+ *
+ * This is safe to call repeatedly but does not migrate or modify tables that
+ * already exist.
+ *
+ * @param db Open application database to initialize.
+ */
 export const initDatabaseSchema = (db) => {
     initUsersTable(db);
     initCCTable(db);

@@ -1,3 +1,4 @@
+/** Tests visitor filters, inclusive date ranges, and CRUD behavior. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { VisitorsModel } from "../../models/visitorsModel";

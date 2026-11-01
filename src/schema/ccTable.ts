@@ -5,23 +5,33 @@ import { sql } from "drizzle-orm";
 import type { Database } from "better-sqlite3";
 import type { AppDatabase } from "../db.js";
 
+/** SQLite definition of a payment-card record. */
 export const ccTable = sqliteTable("credit_cards", {
+    /** UUID generated when an ID is not supplied. */
     id: text("id")
         .primaryKey()
         .notNull()
         .$defaultFn(() => randomUUID()),
+    /** Name printed on the card. */
     cardholderName: text("cardholder_name").notNull(),
+    /** Billing address stored as JSON text; serialize before inserting. */
     billingAddress: text("billing_address")
         .notNull()
         .$type<Address>(),
+    /** Card number stored as text to preserve leading zeroes. */
     cardNumber: text("card_number").notNull().unique(),
+    /** Two-character expiration month. */
     expirationMonth: text("expiration_month")
         .notNull(),
+    /** Two- or four-character expiration year. */
     expirationYear: text("expiration_year").notNull(),
+    /** Card verification value. Stored in plaintext by this schema. */
     cvv: text("cvv").notNull(),
+    /** Creation time, represented as a JavaScript `Date` by Drizzle. */
     createdAt: integer("created_at", { mode: "timestamp" })
         .notNull()
         .$default(() => sql`(strftime('%s', 'now'))`),
+    /** Last update time, represented as a JavaScript `Date` by Drizzle. */
     updatedAt: integer("updated_at", { mode: "timestamp" })
         .notNull()
         .$default(() => sql`(strftime('%s', 'now'))`),
@@ -34,10 +44,18 @@ export const ccTable = sqliteTable("credit_cards", {
     
 ]);
 
+/** A payment-card row returned from the database. */
 export type CreditCard = typeof ccTable.$inferSelect;
+/** Values accepted when inserting a payment-card row. */
 export type NewCreditCard = typeof ccTable.$inferInsert;
+/** Optional payment-card fields accepted by an update operation. */
 export type UpdateCreditCard = Partial<NewCreditCard>;
 
+/**
+ * Create the credit-cards table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export function initCCTable(db: AppDatabase) {
     db.run(`
         CREATE TABLE IF NOT EXISTS credit_cards (

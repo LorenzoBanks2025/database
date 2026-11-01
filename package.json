@@ -22,7 +22,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepare": "npm run build",
-    "test": "npx --yes tsx@4.20.6 --test src/tests/*.test.ts src/tests/**/*.test.ts"
+    "test": "tsx --test src/tests/*.test.ts src/tests/**/*.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,9 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "tsx": "4.23.15",
     "typescript": "^5.9.3"
-  },
-  "allowScripts": {
-    "better-sqlite3@13.0.3": true
   }
 }

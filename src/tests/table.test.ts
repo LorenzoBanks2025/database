@@ -1,3 +1,4 @@
+/** Tests schema registration, declared constraints, and SQLite enforcement. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { getTableConfig } from "drizzle-orm/sqlite-core";

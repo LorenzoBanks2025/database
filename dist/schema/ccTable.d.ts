@@ -1,5 +1,6 @@
 import type { Address } from "../types/address.js";
 import type { AppDatabase } from "../db.js";
+/** SQLite definition of a payment-card record. */
 export declare const ccTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
     name: "credit_cards";
     schema: undefined;
@@ -175,8 +176,16 @@ export declare const ccTable: import("drizzle-orm/sqlite-core").SQLiteTableWithC
     };
     dialect: "sqlite";
 }>;
+/** A payment-card row returned from the database. */
 export type CreditCard = typeof ccTable.$inferSelect;
+/** Values accepted when inserting a payment-card row. */
 export type NewCreditCard = typeof ccTable.$inferInsert;
+/** Optional payment-card fields accepted by an update operation. */
 export type UpdateCreditCard = Partial<NewCreditCard>;
+/**
+ * Create the credit-cards table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export declare function initCCTable(db: AppDatabase): void;
 //# sourceMappingURL=ccTable.d.ts.map

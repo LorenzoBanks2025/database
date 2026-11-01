@@ -1,3 +1,13 @@
+/**
+ * Public entry point for database lifecycle functions, schema definitions,
+ * typed row shapes, and CRUD models.
+ *
+ * JSON-shaped values in text columns must be encoded as JSON strings before
+ * they are written and decoded by the caller when read. This package provides
+ * schema typing, not automatic serialization or encryption.
+ *
+ * @packageDocumentation
+ */
 export { createDatabase, loadDatabase, openDatabase } from "./db.js";
 export { DatabaseSchema, initDatabaseSchema } from "./schema.js";
 export { CreditCardModel } from "./models/ccModel.js";

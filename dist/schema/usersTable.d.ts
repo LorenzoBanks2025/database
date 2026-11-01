@@ -1,4 +1,5 @@
 import type { AppDatabase } from "../db.js";
+/** SQLite definition of an application user record. */
 export declare const usersTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
     name: "users";
     schema: undefined;
@@ -116,8 +117,16 @@ export declare const usersTable: import("drizzle-orm/sqlite-core").SQLiteTableWi
     };
     dialect: "sqlite";
 }>;
+/** A user row returned from the database. */
 export type User = typeof usersTable.$inferSelect;
+/** Values accepted when inserting a user; database defaults may be omitted. */
 export type NewUser = typeof usersTable.$inferInsert;
+/** Optional user fields accepted by an update operation. */
 export type UpdateUser = Partial<NewUser>;
+/**
+ * Create the users table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export declare function initUsersTable(db: AppDatabase): void;
 //# sourceMappingURL=usersTable.d.ts.map

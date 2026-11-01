@@ -1,5 +1,12 @@
 import type { AppDatabase } from "./db.js";
+/**
+ * Drizzle table definitions registered on the application database client.
+ *
+ * This object is used by Drizzle for typed queries; it does not itself create
+ * the corresponding tables in SQLite.
+ */
 export declare const DatabaseSchema: {
+    /** User records. */
     usersTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
         name: "users";
         schema: undefined;
@@ -117,6 +124,7 @@ export declare const DatabaseSchema: {
         };
         dialect: "sqlite";
     }>;
+    /** Payment-card records. */
     ccTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
         name: "credit_cards";
         schema: undefined;
@@ -292,6 +300,7 @@ export declare const DatabaseSchema: {
         };
         dialect: "sqlite";
     }>;
+    /** Visitor event records. */
     visitorsTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
         name: "visitors";
         schema: undefined;
@@ -391,6 +400,7 @@ export declare const DatabaseSchema: {
         };
         dialect: "sqlite";
     }>;
+    /** Personal profile records. */
     fullzTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
         name: "fullz";
         schema: undefined;
@@ -623,6 +633,7 @@ export declare const DatabaseSchema: {
         };
         dialect: "sqlite";
     }>;
+    /** Lead records. */
     leadsTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
         name: "leads";
         schema: undefined;
@@ -820,5 +831,13 @@ export declare const DatabaseSchema: {
         dialect: "sqlite";
     }>;
 };
+/**
+ * Create each application table when it does not already exist.
+ *
+ * This is safe to call repeatedly but does not migrate or modify tables that
+ * already exist.
+ *
+ * @param db Open application database to initialize.
+ */
 export declare const initDatabaseSchema: (db: AppDatabase) => void;
 //# sourceMappingURL=schema.d.ts.map

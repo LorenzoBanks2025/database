@@ -1,5 +1,6 @@
 import type { BrowserFingerprint } from "../types/browserFingerprint.js";
 import type { AppDatabase } from "../db.js";
+/** SQLite definition of a visitor event record. */
 export declare const visitorsTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
     name: "visitors";
     schema: undefined;
@@ -99,8 +100,16 @@ export declare const visitorsTable: import("drizzle-orm/sqlite-core").SQLiteTabl
     };
     dialect: "sqlite";
 }>;
+/** A visitor event row returned from the database. */
 export type Visitor = typeof visitorsTable.$inferSelect;
+/** Values accepted when inserting a visitor event. */
 export type NewVisitor = typeof visitorsTable.$inferInsert;
+/** Optional visitor fields accepted by an update operation. */
 export type UpdateVisitor = Partial<NewVisitor>;
+/**
+ * Create the visitors table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export declare function initVisitorsTable(db: AppDatabase): void;
 //# sourceMappingURL=visitorsTable.d.ts.map

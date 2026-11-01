@@ -1,3 +1,4 @@
+/** Tests connection creation, required-file behavior, and table initialization. */
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { mkdtempSync, rmSync } from "node:fs";

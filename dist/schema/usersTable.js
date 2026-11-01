@@ -1,21 +1,33 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
+/** SQLite definition of an application user record. */
 export const usersTable = sqliteTable("users", {
+    /** UUID generated when an ID is not supplied. */
     id: text("id")
         .primaryKey()
         .notNull()
         .$defaultFn(() => randomUUID()),
+    /** User's given name. */
     firstName: text("first_name").notNull(),
+    /** User's family name. */
     lastName: text("last_name").notNull(),
+    /** Unique email address. */
     email: text("email").notNull().unique(),
+    /** Creation time, represented as a JavaScript `Date` by Drizzle. */
     createdAt: integer("created_at", { mode: "timestamp" })
         .notNull()
         .$default(() => sql `(strftime('%s', 'now'))`),
+    /** Last update time, represented as a JavaScript `Date` by Drizzle. */
     updatedAt: integer("updated_at", { mode: "timestamp" })
         .notNull()
         .$default(() => sql `(strftime('%s', 'now'))`),
 });
+/**
+ * Create the users table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export function initUsersTable(db) {
     db.run(`
         CREATE TABLE IF NOT EXISTS users (

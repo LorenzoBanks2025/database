@@ -1,7 +1,10 @@
 import type Address from "../types/address.js";
 import type { AppDatabase } from "../db.js";
+/** List of email addresses associated with a lead. */
 export type EmailList = string[];
+/** List of phone numbers associated with a lead. */
 export type PhoneList = string[];
+/** SQLite definition of a lead record. */
 export declare const leadsTable: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
     name: "leads";
     schema: undefined;
@@ -198,8 +201,16 @@ export declare const leadsTable: import("drizzle-orm/sqlite-core").SQLiteTableWi
     };
     dialect: "sqlite";
 }>;
+/** A lead row returned from the database. */
 export type Lead = typeof leadsTable.$inferSelect;
+/** Values accepted when inserting a lead. */
 export type NewLead = typeof leadsTable.$inferInsert;
+/** Optional lead fields accepted by an update operation. */
 export type UpdateLead = Partial<NewLead>;
+/**
+ * Create the leads table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export declare function initLeadsTable(db: AppDatabase): void;
 //# sourceMappingURL=leadsTable.d.ts.map

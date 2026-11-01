@@ -1,22 +1,38 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "node:crypto";
+/** SQLite definition of a lead record. */
 export const leadsTable = sqliteTable("leads", {
+    /** UUID generated when an ID is not supplied. */
     id: text("id")
         .primaryKey()
         .notNull()
         .$defaultFn(() => randomUUID()),
+    /** Given name; defaults to an empty string on insert. */
     firstName: text("first_name").$default(() => ""),
+    /** Optional middle name; defaults to an empty string on insert. */
     middleName: text("middle_name").$default(() => ""),
+    /** Family name; defaults to an empty string on insert. */
     lastName: text("last_name").$default(() => ""),
+    /** Email addresses stored as JSON text; serialize before inserting. */
     emails: text("email").$type().$default(() => []),
+    /** Phone numbers stored as JSON text; serialize before inserting. */
     phone: text("phone").$type().$default(() => []),
+    /** Optional address stored as JSON text; serialize before inserting. */
     address: text("address").$type(),
+    /** Source from which the lead was collected; defaults to an empty string. */
     scrapedFrom: text("scraped_from").$default(() => ""),
+    /** Creation time stored as a Unix timestamp in seconds. */
     createdAt: integer("created_at", { mode: "timestamp" })
         .notNull(),
+    /** Last update time stored as a Unix timestamp in seconds. */
     updatedAt: integer("updated_at", { mode: "timestamp" })
         .notNull(),
 });
+/**
+ * Create the leads table if it does not already exist.
+ *
+ * @param db Open application database.
+ */
 export function initLeadsTable(db) {
     db.run(`
         CREATE TABLE IF NOT EXISTS leads (

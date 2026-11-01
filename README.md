@@ -1,33 +1,179 @@
-# Database
+# `@nfa/database`
 
-SQLite database schema and data models for the workspace. This package is ESM-only and requires Node.js 22 or newer.
+`@nfa/database` is an ESM-only TypeScript package that provides a synchronous
+SQLite connection, Drizzle table definitions, and models for users, payment
+cards, visitor events, personal profiles, and leads. It requires Node.js 22 or
+newer.
 
-## Build
+For the workspace-wide database reference, see
+[docs/DATABASE.md](../../docs/DATABASE.md).
+
+> **Sensitive data:** The schema includes payment-card data, CVVs, Social
+> Security numbers, contact details, IP addresses, and browser fingerprints.
+> Values are stored as ordinary SQLite text/integer data. This package does
+> not encrypt, tokenize, mask, redact, or enforce retention or access-control
+> policies. Do not treat the schema as evidence of PCI DSS, privacy-law, or
+> other compliance. Applications are responsible for lawful collection,
+> authorization, secure storage, access control, backups, retention, and
+> deletion.
+
+## Install
+
+From the pnpm workspace root:
+
+```sh
+pnpm install
+```
+
+The package is part of the workspace as `@nfa/database`; consuming workspace
+projects should declare it as a workspace dependency:
+
+```sh
+pnpm --filter my-app add @nfa/database@workspace:*
+```
+
+Replace `my-app` with the package name of the consuming workspace project.
+
+## Build, test, and typecheck
+
+Run package scripts from the workspace root:
 
 ```sh
 pnpm --filter @nfa/database build
+pnpm --filter @nfa/database test
+pnpm --filter @nfa/database typecheck
 ```
 
-The build writes JavaScript modules and TypeScript declarations to `dist/`.
+Or run the corresponding root command to execute scripts in every workspace
+project:
 
-## Usage
+```sh
+pnpm build
+pnpm test
+pnpm typecheck
+```
+
+The TypeScript build writes ESM JavaScript, source maps, and declarations to
+`dist/`. The package export points to those build outputs; build the package
+before importing it from an application.
+
+## Quick start
 
 ```ts
 import { createDatabase, UserModel } from "@nfa/database";
 
-const connection = createDatabase("./app.sqlite");
-const users = new UserModel(connection);
+const connection = createDatabase("./data/app.sqlite");
 
 try {
+  const users = new UserModel(connection);
   const user = users.create({
     firstName: "Ada",
     lastName: "Lovelace",
     email: "ada@example.com",
   });
-  console.log(user.id);
+
+  console.log(user.id, user.createdAt);
 } finally {
   connection.close();
 }
 ```
 
-The package root also exports the schema tables and initialization functions, the database connection types, model classes, row/insert/update types, `Address`, and `BrowserFingerprint`.
+`createDatabase` creates parent directories for file-backed databases, opens
+the database, enables WAL journaling and foreign-key enforcement, and creates
+missing tables. Always close the connection when finished. For an in-memory
+database, pass `":memory:"`.
+
+## Database lifecycle
+
+- `openDatabase(filename, mustExist)` opens and configures SQLite without
+  initializing application tables. Relative paths resolve from the Node.js
+  process working directory. When `mustExist` is false, missing parent
+  directories are created. The `":memory:"` filename creates an in-memory DB.
+- `loadDatabase(filename)` requires an existing database file and assumes its
+  schema is already present; it does not initialize or migrate tables.
+- `createDatabase(filename)` creates a missing database and creates any
+  missing application tables. Existing tables and rows are preserved. This is
+  idempotent initialization, **not** a schema migration system; it does not
+  change existing table definitions.
+- Each function returns `{ db, close }`. The `db` property is the typed Drizzle
+  client and `$client` exposes the underlying `better-sqlite3` connection.
+  Closing releases the SQLite connection.
+
+Initialization errors are thrown. `createDatabase` closes its connection if
+table initialization fails.
+
+## Data representation and schema
+
+The Drizzle definitions provide static TypeScript types but do not add runtime
+serialization to text columns. The address, lead-list, and browser-fingerprint
+values described below are stored as SQLite `TEXT`; encode them with
+`JSON.stringify` before writing and parse the returned text with `JSON.parse`
+when reading. A TypeScript `$type<T>()` annotation alone does not convert an
+object or array to JSON.
+
+Some columns are typed in TypeScript as their decoded object or array shape,
+even though SQLite and the driver require text. The current model API does not
+bridge that type/runtime difference, so callers may need a narrow type
+assertion when passing serialized JSON. Returned values also need parsing
+before use as objects or arrays.
+
+| Table | Data | Notable constraints and representation |
+| --- | --- | --- |
+| `users` | Names, unique email, creation/update timestamps | UUID IDs are generated by Drizzle on inserts. |
+| `credit_cards` | Cardholder, billing address, number, expiration, CVV | Card number is unique; number length must be 15 or 16, month 2, year 2 or 4, CVV 3 or 4 characters. Address is JSON text. |
+| `visitors` | IP address, user agent, visit time, fingerprint | Auto-increment ID; IP is at most 45 characters; user agent at most 255 characters; fingerprint is JSON text. |
+| `fullz` | Optional name, DOB, SSN, address, phone, email, mother's maiden name | SSN, if present, must be 9 characters. Address is JSON text. |
+| `leads` | Name, emails, phones, address, source, timestamps | Email and phone lists and address are JSON text. The initializer declares every column `NOT NULL`; timestamps must be supplied. |
+
+Timestamps use Drizzle's `timestamp` mode and are represented as JavaScript
+`Date` values in model results. The schema stores timestamp integers in Unix
+seconds. Some generated values are Drizzle-side defaults, not SQLite column
+defaults; direct SQL inserts must provide every required field and value.
+In particular, the `leads` initializer requires `created_at` and `updated_at`,
+while the Drizzle column definitions do not provide timestamp defaults. The
+lead initializer also declares name, email, phone, address, and source columns
+`NOT NULL`; check both the SQLite initializer and Drizzle types when preparing
+lead inserts.
+
+The database initialization functions create tables only when absent. Changes
+to columns or constraints require a separately designed migration; do not
+assume calling `createDatabase` upgrades existing files.
+
+## Models and query behavior
+
+The package exports `UserModel`, `CreditCardModel`, `VisitorsModel`,
+`FullzModel`, and `LeadsModel`. Construct a model with an open
+`DatabaseConnection`. Methods query the records directly and return full rows:
+single-row lookups return `undefined` when no record matches, collection
+lookups return arrays, and update/delete methods return the affected row or
+`undefined`.
+
+Searches generally use exact equality. Exceptions and details:
+
+- `CreditCardModel.findByBin` matches card numbers beginning with the supplied
+  string, and `findByLast4` matches numbers ending with it. Card-brand methods
+  use the prefix ranges encoded in the implementation; they are not a
+  general-purpose payment-network identification service.
+- `LeadsModel.findByEmail` and `findByPhone` use substring matching on the
+  stored text, not exact matching against decoded JSON array elements.
+- Address lookup methods use SQLite `json_extract` on the serialized address
+  text and compare the selected value exactly.
+- `VisitorsModel.findByVisitDateRange` includes both date endpoints.
+
+See the TSDoc on the exported declarations and model methods for parameter
+details and return types.
+
+## Public exports
+
+The package root exports:
+
+- Lifecycle helpers: `openDatabase`, `loadDatabase`, `createDatabase`,
+  `AppDatabase`, and `DatabaseConnection`.
+- Schema registry and initializers: `DatabaseSchema`,
+  `initDatabaseSchema`, and each table definition/initializer.
+- The five model classes.
+- Select, insert, and update row types for each table.
+- `Address` and `BrowserFingerprint`.
+
+The TypeScript source of each declaration is the API reference and includes
+TSDoc comments.
