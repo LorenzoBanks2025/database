@@ -16,6 +16,7 @@ test("UserModel supports lookup, CRUD, and list operations", () => {
             avatarUrl: "https://example.invalid/avatar.png",
         });
 
+        assert.equal(model.count(), 1);
         assert.equal(model.findById(created.id)?.email, created.email);
         assert.equal(model.findByEmail(created.email)?.id, created.id);
         assert.equal(model.findById(created.id)?.avatarUrl, "https://example.invalid/avatar.png");
@@ -28,6 +29,7 @@ test("UserModel supports lookup, CRUD, and list operations", () => {
         assert.equal(updated?.avatarUrl, "https://example.invalid/updated.png");
         assert.equal(model.delete(created.id)?.id, created.id);
         assert.equal(model.findById(created.id), undefined);
+        assert.equal(model.count(), 0);
     } finally {
         connection.close();
     }

@@ -1,7 +1,7 @@
 import type { DatabaseConnection } from "../db.js";
 import { usersTable } from "../schema/usersTable.js";
 import type { User, NewUser, UpdateUser } from "../schema/usersTable.js";
-import { sql, eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 /** Query and mutate application user rows. */
 export class UserModel {
@@ -31,6 +31,20 @@ export class UserModel {
     /** Return every user row. */
     findAll(): User[] {
         return this.connection.db.select().from(usersTable).all();
+    }
+
+    /** Return the number of registered users. */
+    count(): number {
+        const result = this.connection.db
+            .select({ count: count() })
+            .from(usersTable)
+            .get();
+
+        if (!result) {
+            throw new Error("Could not count registered users.");
+        }
+
+        return result.count;
     }
 
     /** Insert a user and return the inserted row. */
