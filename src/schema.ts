@@ -3,6 +3,7 @@ import { initCCTable, ccTable } from "./schema/ccTable.js";
 import { initVisitorsTable, visitorsTable } from "./schema/visitorsTable.js";
 import { initFullzTable, fullzTable } from "./schema/fullzTable.js";
 import { initLeadsTable, leadsTable } from "./schema/leadsTable.js";
+import { initUserGroupTable, userGroupTable } from "./schema/userGroupTable.js";
 import type { AppDatabase } from "./db.js";
 
 /**
@@ -14,6 +15,8 @@ import type { AppDatabase } from "./db.js";
 export const DatabaseSchema = {
     /** User records. */
     usersTable,
+    /** One administrator or user role assignment per user. */
+    userGroupTable,
     /** Payment-card records. */
     ccTable,
     /** Visitor event records. */
@@ -34,6 +37,7 @@ export const DatabaseSchema = {
  */
 export const initDatabaseSchema = (db: AppDatabase) => {
     initUsersTable(db);
+    initUserGroupTable(db);
     initCCTable(db);
     initVisitorsTable(db);
     initFullzTable(db);

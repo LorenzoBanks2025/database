@@ -6,6 +6,7 @@ import { DatabaseSchema } from "../schema";
 import { ccTable } from "../schema/ccTable";
 import { fullzTable } from "../schema/fullzTable";
 import { leadsTable } from "../schema/leadsTable";
+import { userGroupTable } from "../schema/userGroupTable";
 import { usersTable } from "../schema/usersTable";
 import { visitorsTable } from "../schema/visitorsTable";
 import { createTestDatabase } from "./testDatabase";
@@ -14,6 +15,7 @@ test("schema exports the user table used by the database connection", () => {
     assert.equal(DatabaseSchema.usersTable, usersTable);
     assert.deepEqual(Object.keys(DatabaseSchema), [
         "usersTable",
+        "userGroupTable",
         "ccTable",
         "visitorsTable",
         "fullzTable",
@@ -34,6 +36,7 @@ test("table definitions expose the expected columns and constraints", () => {
         "valid_user_agent",
     ]);
     assert.equal(getTableConfig(usersTable).columns.find(({ name }) => name === "email")?.isUnique, true);
+    assert.deepEqual(getTableConfig(userGroupTable).checks.map(({ name }) => name), ["valid_user_group_role"]);
     assert.equal(getTableConfig(leadsTable).name, "leads");
 });
 
