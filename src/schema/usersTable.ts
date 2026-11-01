@@ -17,6 +17,8 @@ export const usersTable = sqliteTable("users", {
     lastName: text("last_name").notNull(),
     /** Unique email address. */
     email: text("email").notNull().unique(),
+    /** Optional URL for the user's avatar image. */
+    avatarUrl: text("avatar_url"),
     /** Creation time, represented as a JavaScript `Date` by Drizzle. */
     createdAt: integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -47,8 +49,17 @@ export function initUsersTable(db: AppDatabase) {
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
+            avatar_url TEXT,
             created_at INTEGER NOT NULL,
             updated_at INTEGER NOT NULL
         );
     `);
+
+    const avatarUrlColumn = db.$client
+        .prepare("SELECT name FROM pragma_table_info('users') WHERE name = ?")
+        .get("avatar_url");
+
+    if (!avatarUrlColumn) {
+        db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT;");
+    }
 }

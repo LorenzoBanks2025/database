@@ -16,6 +16,7 @@ export { FullzModel } from "./models/fullzModel.js";
 export { LeadsModel } from "./models/leadsModel.js";
 export { UserModel } from "./models/userModel.js";
 export { UserGroupModel } from "./models/userGroupModel.js";
+export { AuthenticationModel } from "./models/authenticationModel.js";
 export { VisitorsModel } from "./models/visitorsModel.js";
 export { ccTable, initCCTable } from "./schema/ccTable.js";
 export type { CreditCard, NewCreditCard, UpdateCreditCard } from "./schema/ccTable.js";
@@ -25,6 +26,17 @@ export { leadsTable, initLeadsTable } from "./schema/leadsTable.js";
 export type { Lead, NewLead, UpdateLead } from "./schema/leadsTable.js";
 export { usersTable, initUsersTable } from "./schema/usersTable.js";
 export type { NewUser, UpdateUser, User } from "./schema/usersTable.js";
+export {
+    authCredentialsTable,
+    authSessionsTable,
+    initAuthenticationTables,
+} from "./schema/authenticationTable.js";
+export type {
+    AuthCredential,
+    AuthSession,
+    NewAuthCredential,
+    NewAuthSession,
+} from "./schema/authenticationTable.js";
 export { initUserGroupTable, userGroupTable } from "./schema/userGroupTable.js";
 export type { NewUserGroup, UpdateUserGroup, UserGroup, UserRole } from "./schema/userGroupTable.js";
 export { initVisitorsTable, visitorsTable } from "./schema/visitorsTable.js";

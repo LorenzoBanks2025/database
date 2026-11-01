@@ -13,12 +13,19 @@ test("UserModel supports lookup, CRUD, and list operations", () => {
             firstName: "Test",
             lastName: "User",
             email: "test@example.invalid",
+            avatarUrl: "https://example.invalid/avatar.png",
         });
 
         assert.equal(model.findById(created.id)?.email, created.email);
         assert.equal(model.findByEmail(created.email)?.id, created.id);
+        assert.equal(model.findById(created.id)?.avatarUrl, "https://example.invalid/avatar.png");
         assert.deepEqual(model.findAll().map(({ id }) => id), [created.id]);
-        assert.equal(model.update(created.id, { firstName: "Updated" })?.firstName, "Updated");
+        const updated = model.update(created.id, {
+            firstName: "Updated",
+            avatarUrl: "https://example.invalid/updated.png",
+        });
+        assert.equal(updated?.firstName, "Updated");
+        assert.equal(updated?.avatarUrl, "https://example.invalid/updated.png");
         assert.equal(model.delete(created.id)?.id, created.id);
         assert.equal(model.findById(created.id), undefined);
     } finally {

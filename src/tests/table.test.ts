@@ -16,6 +16,8 @@ test("schema exports the user table used by the database connection", () => {
     assert.deepEqual(Object.keys(DatabaseSchema), [
         "usersTable",
         "userGroupTable",
+        "authCredentialsTable",
+        "authSessionsTable",
         "ccTable",
         "visitorsTable",
         "fullzTable",

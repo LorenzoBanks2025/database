@@ -4,6 +4,11 @@ import { initVisitorsTable, visitorsTable } from "./schema/visitorsTable.js";
 import { initFullzTable, fullzTable } from "./schema/fullzTable.js";
 import { initLeadsTable, leadsTable } from "./schema/leadsTable.js";
 import { initUserGroupTable, userGroupTable } from "./schema/userGroupTable.js";
+import {
+    authCredentialsTable,
+    authSessionsTable,
+    initAuthenticationTables,
+} from "./schema/authenticationTable.js";
 import type { AppDatabase } from "./db.js";
 
 /**
@@ -17,6 +22,9 @@ export const DatabaseSchema = {
     usersTable,
     /** One administrator or user role assignment per user. */
     userGroupTable,
+    /** Password credentials and hashed authentication sessions. */
+    authCredentialsTable,
+    authSessionsTable,
     /** Payment-card records. */
     ccTable,
     /** Visitor event records. */
@@ -37,6 +45,7 @@ export const DatabaseSchema = {
  */
 export const initDatabaseSchema = (db: AppDatabase) => {
     initUsersTable(db);
+    initAuthenticationTables(db);
     initUserGroupTable(db);
     initCCTable(db);
     initVisitorsTable(db);
